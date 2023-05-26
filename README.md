@@ -58,6 +58,14 @@ Run the following command to deploy the Hello MicroShift sample application:
 oc apply -k https://github.com/jaredhocutt/edge-workshop/demo
 ```
 
+To find the hostname of your Hello MicroShift application, run the following command:
+
+```bash
+oc get route -n demo
+NAME               HOST                                                                ADMITTED   SERVICE            TLS
+hello-microshift   hello-microshift-demo.apps.microshift-example.sandbox.opentlc.com   True       hello-microshift
+```
+
 If you'd like to change your current context to default to the new namespace of your sample
 application, run the following command:
 

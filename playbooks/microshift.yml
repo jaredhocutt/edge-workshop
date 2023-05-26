@@ -151,8 +151,3 @@
         content: "{{ openshift_pull_secret }}"
         dest: ~/openshift-pull-secret
         mode: '0600'
-
-
-    # TODO: Install cockpit and storage
-    # TODO: Fork hello-microshift project to fix route
-    # TODO: slide with links to docs (maybe a gist?)
