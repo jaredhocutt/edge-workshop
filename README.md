@@ -46,3 +46,21 @@ apiServer:
   subjectAltNames:
     - api.microshift-example.sandbox.opentlc.com
 ```
+
+## Sample Application
+
+Once your MicroShift cluster is running and you have verified that you can use the CLI tools (`oc`
+or `kubectl`), it's time to deploy a sample application to see it actually run something.
+
+Run the following command to deploy the Hello MicroShift sample application:
+
+```bash
+oc apply -k https://github.com/jaredhocutt/edge-workshop/demo
+```
+
+If you'd like to change your current context to default to the new namespace of your sample
+application, run the following command:
+
+```bash
+oc config set-context --current --namespace=demo
+```

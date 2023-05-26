@@ -8,5 +8,4 @@ spec:
     name: hello-microshift
   port:
     targetPort: 8080
-  tls: {}
   wildcardPolicy: None
