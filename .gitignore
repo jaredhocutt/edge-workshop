@@ -1,2 +1,5 @@
 .ansible/*
 !.ansible/.gitkeep
+
+vars/*
+!vars/main.example.yml

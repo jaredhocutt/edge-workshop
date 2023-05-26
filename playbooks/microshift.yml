@@ -1,0 +1,158 @@
+---
+
+- hosts: localhost
+  vars_files:
+    - ../vars/main.yml
+  tasks:
+    - name: Create instances
+      amazon.aws.ec2_instance:
+        name: "microshift-{{ '%02d' | format(item) }}"
+        image_id: "{{ rhel_92_ami }}"
+        key_name: "{{ key_pair_name }}"
+        security_group: "{{ security_group_name }}"
+        vpc_subnet_id: "{{ vpc_subnet_id }}"
+        instance_type: t3.medium
+        network:
+          assign_public_ip: true
+        volumes:
+          - device_name: /dev/sdb
+            ebs:
+              volume_size: 20
+              delete_on_termination: true
+        tags:
+          Name: "microshift-{{ '%02d' | format(item) }}"
+        state: running
+      loop: "{{ range(1, student_count + 1, 1) | list }}"
+      register: r_create_ec2_instances
+
+    - ansible.builtin.debug:
+        var: r_create_ec2_instances
+
+    - name: Create hostname DNS entry
+      amazon.aws.route53:
+        record: "{{ item.instances.0.tags.Name }}.{{ route53_zone_name }}"
+        zone: "{{ route53_zone_name }}"
+        type: A
+        ttl: 300
+        value: "{{ item.instances.0.public_ip_address }}"
+        wait: false
+        state: present
+      loop: "{{ r_create_ec2_instances.results }}"
+
+    - name: Create API DNS entry
+      amazon.aws.route53:
+        record: "api.{{ item.instances.0.tags.Name }}.{{ route53_zone_name }}"
+        zone: "{{ route53_zone_name }}"
+        type: A
+        ttl: 300
+        value: "{{ item.instances.0.public_ip_address }}"
+        wait: false
+        state: present
+      loop: "{{ r_create_ec2_instances.results }}"
+
+    - name: Create apps DNS entry
+      amazon.aws.route53:
+        record: "*.apps.{{ item.instances.0.tags.Name }}.{{ route53_zone_name }}"
+        zone: "{{ route53_zone_name }}"
+        type: A
+        ttl: 300
+        value: "{{ item.instances.0.public_ip_address }}"
+        wait: false
+        state: present
+      loop: "{{ r_create_ec2_instances.results }}"
+
+    - name: Add instances to inventory
+      ansible.builtin.add_host:
+        name: "{{ item.instances.0.tags.Name }}"
+        ansible_host: "{{ item.instances.0.public_ip_address }}"
+        ansible_user: ec2-user
+        ansible_ssh_private_key_file: "{{ key_pair_path }}"
+        groups:
+          - microshifts
+      loop: "{{ r_create_ec2_instances.results }}"
+      changed_when: false
+
+    - ansible.builtin.debug:
+        msg: "{{ groups.microshifts }}"
+
+    - name: Wait for instances to boot
+      ansible.builtin.wait_for:
+        host: "{{ hostvars[item].ansible_host }}"
+        port: 22
+        search_regex: OpenSSH
+      delegate_to: localhost
+      loop: "{{ groups.microshifts }}"
+
+- hosts: microshifts
+  vars_files:
+    - ../vars/main.yml
+  tasks:
+    - name: Subscribe to RHSM
+      community.general.redhat_subscription:
+        consumer_name: "{{ inventory_hostname }}"
+        username: "{{ lookup('ansible.builtin.env', 'RHSM_USERNAME') }}"
+        password: "{{ lookup('ansible.builtin.env', 'RHSM_PASSWORD') }}"
+        auto_attach: true
+        state: present
+      become: true
+
+    - name: Allow RHSM to manage repos
+      ansible.builtin.command: subscription-manager config --rhsm.manage_repos=1
+      become: true
+
+    - name: Enable SSH password auth
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication '
+        line: 'PasswordAuthentication yes'
+      become: true
+      register: r_enable_ssh_password_auth
+
+    - name: Restart SSHD
+      ansible.builtin.systemd:
+        name: sshd
+        state: restarted
+      become: true
+      when: r_enable_ssh_password_auth.changed
+
+    - name: Set a password for ec2-user
+      ansible.builtin.user:
+        name: ec2-user
+        password: "{{ ec2_user_password }}"
+        update_password: always
+      become: true
+
+    - name: Install required packages
+      ansible.builtin.dnf:
+        name:
+          - lvm2
+          - vim
+          - cockpit
+          - cockpit-storaged
+        state: present
+      become: true
+
+    - name: Start and enable cockpit
+      ansible.builtin.systemd:
+        name: cockpit.socket
+        enabled: true
+        state: started
+      become: true
+
+    - name: Create volume group required for microshift
+      community.general.lvg:
+        vg: rhel
+        pvs: /dev/nvme1n1
+        state: present
+      become: true
+
+    - name: Output pull secret to file
+      ansible.builtin.copy:
+        content: "{{ openshift_pull_secret }}"
+        dest: ~/openshift-pull-secret
+        mode: '0600'
+
+
+    # TODO: Install cockpit and storage
+    # TODO: Fork hello-microshift project to fix route
+    # TODO: slide with links to docs (maybe a gist?)

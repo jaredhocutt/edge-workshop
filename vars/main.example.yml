@@ -1,0 +1,32 @@
+---
+
+# Assumptions
+# - You already have a VPC created with public subnets
+#     - You'll need the IDs of the VPC and public subnets
+# - You have a keypair already created that can be shared with students
+# - You have a security group that has the following ports open
+#     - 22
+#     - 80
+#     - 443
+#     - 6443
+#     - 9090
+# - You have your RHSM username and password set as environment variables
+#     - RHSM_USERNAME
+#     - RHSM_PASSWORD
+
+student_count: 5
+
+rhel_92_ami: ami-1234
+security_group_name: default
+vpc_subnet_id: subnet-1234
+route53_zone_name: sandbox.example.com
+
+key_pair_name: microshift
+key_pair_path: ~/.ssh/microshift.pem
+
+# This value must be hashed
+# https://docs.ansible.com/ansible/latest/reference_appendices/faq.html#how-do-i-generate-encrypted-passwords-for-the-user-module
+ec2_user_password: $6$4gDvDCVenr6W.L/J$y9oeYl...
+
+openshift_pull_secret: >-
+  {"auths":{"cloud.openshift.com":{"auth":"...
