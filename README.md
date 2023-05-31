@@ -106,15 +106,15 @@ oc config set-context --current --namespace=demo
 ### Learning resources
 Get your own [Developer Subscription (redhat.com, Developer, bottom-of-the-page)](https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux#)
 
-[learn.openshift.com](http://learn.openshift.com) 
+Online, interactive labs with [learn.openshift.com](http://learn.openshift.com) 
 
 Podman/Buildah interactive labs in the [RHEL “Build” section](https://www.redhat.com/en/interactive-labs/enterprise-linux#build):
-  [Building container images with RHEL container tools](https://www.redhat.com/en/interactive-labs/build-container-images-red-hat-enterprise-linux-container-tools)
+  - [Building container images with RHEL container tools](https://www.redhat.com/en/interactive-labs/build-container-images-red-hat-enterprise-linux-container-tools)
 
-  [Create images with container tools (Buildah)](https://www.redhat.com/en/interactive-labs/create-images-container-tools-buildah)
+  - [Create images with container tools (Buildah)](https://www.redhat.com/en/interactive-labs/create-images-container-tools-buildah)
 
-  [Deploy containers using Podman container tools](https://www.redhat.com/en/interactive-labs/deploy-containers-podman-container-tools)
+  - [Deploy containers using Podman container tools](https://www.redhat.com/en/interactive-labs/deploy-containers-podman-container-tools)
 
-  [Create and manage Podman pods](https://www.redhat.com/en/interactive-labs/create-and-manage-podman-pods)
+  - [Create and manage Podman pods](https://www.redhat.com/en/interactive-labs/create-and-manage-podman-pods)
 
-[Podman Desktop](https://podman-desktop.io/)
+Run Podman (and OpenShift Local) on your own laptop with [Podman Desktop](https://podman-desktop.io/)
