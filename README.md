@@ -12,8 +12,11 @@ browser-based terminal interface and other UI elements to make connecting to
 the machine and running commands easier to do.
 
 You can find the Cockpit interface at `https://${HOSTNAME}:9090`.
-  - https://microshift-NN.sandbox1567.opentcl.com:9090 (change the 'NN' to your number)
-
+  - Change the 'NN' to your number:
+  ```
+  https://microshift-NN.sandbox1567.opentcl.com:9090 
+  ```
+  
 For example, if your hostname is `microshift-example.sandbox.opentlc.com` then
 you would access the Cockpit interface by going to
 `https://microshift-example.sandbox.opentlc.com:9090`
