@@ -1,4 +1,4 @@
-# Edge Workshop
+# Edge Workshop at oLabs
 
 The instructions for this workshop assume that you have used the automation
 provided in this repository to deploy the infrastructure and configure it
